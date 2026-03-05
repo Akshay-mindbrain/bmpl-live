@@ -1,0 +1,789 @@
+{
+  "info": {
+    "_postman_id": "b26fe8ad-7aea-4b57-8eeb-bf96cf69548e",
+    "name": "BMPL API Collection",
+    "description": "Exported collection for BMPL user/admin services. Auth uses HTTP-only cookies, so login requests must run first on the same base URL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/health"
+          }
+        },
+        {
+          "name": "V1 Health",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/health"
+          }
+        },
+        {
+          "name": "User Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"mobile\": \"9999999999\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password@123\",\n  \"sponsorId\": 1,\n  \"parentId\": 1,\n  \"legPosition\": \"LEFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/users"
+          }
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9999999999\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/users/login"
+          }
+        },
+        {
+          "name": "User Refresh",
+          "request": {
+            "method": "POST",
+            "url": "{{user_base_url}}/v1/users/regen-token"
+          }
+        },
+        {
+          "name": "User Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{user_base_url}}/v1/users/logout"
+          }
+        },
+        {
+          "name": "User List",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/users"
+          }
+        },
+        {
+          "name": "User Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/users/profile/{{user_id}}"
+          }
+        },
+        {
+          "name": "User Downline",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/users/{{user_id}}/downline"
+          }
+        },
+        {
+          "name": "User Upline",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/users/{{user_id}}/upline"
+          }
+        },
+        {
+          "name": "User Last Node Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"legPosition\": \"LEFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/users/{{user_id}}/last-node-update"
+          }
+        },
+        {
+          "name": "User Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/users/{{user_id}}"
+          }
+        },
+        {
+          "name": "User Delete",
+          "request": {
+            "method": "DELETE",
+            "url": "{{user_base_url}}/v1/users/{{user_id}}"
+          }
+        },
+        {
+          "name": "Package Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planName\": \"Starter\",\n  \"Description\": \"Starter plan\",\n  \"BV\": 100,\n  \"price\": 1000,\n  \"dp_amount\": 500,\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/package"
+          }
+        },
+        {
+          "name": "Package List",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/package"
+          }
+        },
+        {
+          "name": "Package Get By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/package/{{plan_id}}"
+          }
+        },
+        {
+          "name": "Package Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 1200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/package/{{plan_id}}"
+          }
+        },
+        {
+          "name": "Package Delete",
+          "request": {
+            "method": "DELETE",
+            "url": "{{user_base_url}}/v1/package/{{plan_id}}"
+          }
+        },
+        {
+          "name": "KYC Cloudinary Signature",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/kyc/cloudinary/signature"
+          }
+        },
+        {
+          "name": "KYC Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"aadharNo\": \"123412341234\",\n  \"aadharImgUrl\": \"https://example.com/aadhar.jpg\",\n  \"panNo\": \"ABCDE1234F\",\n  \"panImageUrl\": \"https://example.com/pan.jpg\",\n  \"bankName\": \"Demo Bank\",\n  \"accountNo\": \"1234567890\",\n  \"ifscCode\": \"DEMO0001234\",\n  \"branchName\": \"Main\",\n  \"bankProofImgUrl\": \"https://example.com/passbook.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/kyc"
+          }
+        },
+        {
+          "name": "KYC List",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/kyc"
+          }
+        },
+        {
+          "name": "KYC Get By User",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/kyc/user/{{user_id}}"
+          }
+        },
+        {
+          "name": "KYC Get By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/kyc/{{kyc_id}}"
+          }
+        },
+        {
+          "name": "KYC Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchName\": \"Updated Branch\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/kyc/{{kyc_id}}"
+          }
+        },
+        {
+          "name": "KYC Delete",
+          "request": {
+            "method": "DELETE",
+            "url": "{{user_base_url}}/v1/kyc/{{kyc_id}}"
+          }
+        },
+        {
+          "name": "Plan Purchase Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan_id\": \"{{plan_id}}\",\n  \"purchase_type\": \"FIRST_PURCHASE\",\n  \"payment_mode\": \"UPI\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{user_base_url}}/v1/planpurchase"
+          }
+        },
+        {
+          "name": "Plan Purchase My Purchases",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/planpurchase/my-purchases"
+          }
+        },
+        {
+          "name": "Plan Purchase Details",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/planpurchase/details/{{purchase_id}}"
+          }
+        },
+        {
+          "name": "System Income",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/systemincome/getincome?page=1&perPage=10"
+          }
+        },
+        {
+          "name": "Wallet",
+          "request": {
+            "method": "GET",
+            "url": "{{user_base_url}}/v1/wallet/get"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/health"
+          }
+        },
+        {
+          "name": "V1 Health",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/health"
+          }
+        },
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"superadmin\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/admin/login"
+          }
+        },
+        {
+          "name": "Admin Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Admin\",\n  \"mobile\": \"8888888888\",\n  \"email\": \"admin2@example.com\",\n  \"username\": \"admin2\",\n  \"password\": \"Password@123\",\n  \"adminType\": \"ADMIN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/admin/register"
+          }
+        },
+        {
+          "name": "Admin Refresh",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/admin/refresh"
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/admin/logout"
+          }
+        },
+        {
+          "name": "Admin Get",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/admin/get"
+          }
+        },
+        {
+          "name": "Admin Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated Admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/admin/update/{{admin_id}}"
+          }
+        },
+        {
+          "name": "Admin Delete",
+          "request": {
+            "method": "DELETE",
+            "url": "{{admin_base_url}}/v1/admin/delete/{{admin_id}}"
+          }
+        },
+        {
+          "name": "Admin Get Users",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/user/getuser"
+          }
+        },
+        {
+          "name": "Admin Update User Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/user/status/{{user_id}}"
+          }
+        },
+        {
+          "name": "Admin Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated User\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/user/update/{{user_id}}"
+          }
+        },
+        {
+          "name": "Plan Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planName\": \"Pro\",\n  \"Description\": \"Pro plan\",\n  \"BV\": 200,\n  \"price\": 2000,\n  \"dp_amount\": 1000,\n  \"features\": [\"Feature 1\", \"Feature 2\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/plan/createplan"
+          }
+        },
+        {
+          "name": "Plan List",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/plan/getplan"
+          }
+        },
+        {
+          "name": "Plan Get By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/plan/getplan/{{plan_id}}"
+          }
+        },
+        {
+          "name": "Plan Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 2200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/plan/updateplan/{{plan_id}}"
+          }
+        },
+        {
+          "name": "Plan Delete",
+          "request": {
+            "method": "DELETE",
+            "url": "{{admin_base_url}}/v1/plan/deleteplan/{{plan_id}}"
+          }
+        },
+        {
+          "name": "Config Save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"autoMemId\": \"STATIC\",\n  \"userRegistrationNo\": 0,\n  \"prefixMemId\": \"BMPL\",\n  \"minLength\": 6,\n  \"incomeCommission\": 10,\n  \"royaltyCommission\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/config/save"
+          }
+        },
+        {
+          "name": "KYC Pending",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/kyc/getkycpending"
+          }
+        },
+        {
+          "name": "KYC Approved",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/kyc/getkycapprove"
+          }
+        },
+        {
+          "name": "KYC Rejected",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/kyc/getkycreject"
+          }
+        },
+        {
+          "name": "KYC All",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/kyc/getallkyc"
+          }
+        },
+        {
+          "name": "KYC One",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/kyc/onekyc/{{kyc_id}}"
+          }
+        },
+        {
+          "name": "KYC Update Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"remark\": \"Verified\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{admin_base_url}}/v1/kyc/updatekycstatus/{{kyc_id}}"
+          }
+        },
+        {
+          "name": "BV Calculate",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/bv/calculate/{{user_id}}"
+          }
+        },
+        {
+          "name": "BV Last Month Team",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/bv/getlastmonth/{{user_id}}"
+          }
+        },
+        {
+          "name": "BV Repurchase",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/bv/getrepurchesbv/{{user_id}}"
+          }
+        },
+        {
+          "name": "BV First Purchase",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/bv/getfirstpurches/{{user_id}}"
+          }
+        },
+        {
+          "name": "BV Self",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/bv/selfbv/{{user_id}}"
+          }
+        },
+        {
+          "name": "Income Generate",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/income/generate"
+          }
+        },
+        {
+          "name": "Income Total",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/income/gettotalincome"
+          }
+        },
+        {
+          "name": "Income History",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/income/history"
+          }
+        },
+        {
+          "name": "Royality Generate",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/royality/generate"
+          }
+        },
+        {
+          "name": "Payout Generate",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/payout/generate"
+          }
+        },
+        {
+          "name": "Payout Get",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/payout/get"
+          }
+        },
+        {
+          "name": "Payout History",
+          "request": {
+            "method": "GET",
+            "url": "{{admin_base_url}}/v1/payout/history"
+          }
+        },
+        {
+          "name": "Reward Generate",
+          "request": {
+            "method": "POST",
+            "url": "{{admin_base_url}}/v1/reward/generate"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "user_base_url",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "admin_base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "user_id",
+      "value": "1"
+    },
+    {
+      "key": "admin_id",
+      "value": "1"
+    },
+    {
+      "key": "plan_id",
+      "value": "replace-with-plan-id"
+    },
+    {
+      "key": "purchase_id",
+      "value": "1"
+    },
+    {
+      "key": "kyc_id",
+      "value": "1"
+    }
+  ]
+}
