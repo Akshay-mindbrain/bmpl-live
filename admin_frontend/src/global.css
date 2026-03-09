@@ -1,0 +1,20 @@
+/* styles/global.css or :root in tailwind */
+@layer base {
+  :root {
+    --color-primary:    #26619A;
+    --color-primary-dark: #1e4978;
+    --color-primary-light: #3b7bb5;
+
+    --color-success:    #10b981;
+    --color-danger:     #ef4444;
+    --color-warning:    #f59e0b;
+
+    --radius-lg:        12px;
+    --radius-xl:        16px;
+    --shadow-sm:        0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md:        0 4px 12px rgba(0,0,0,0.08);
+    --shadow-hover:     0 10px 25px rgba(0,0,0,0.12);
+
+    --transition:       all 0.2s ease;
+  }
+}

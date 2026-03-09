@@ -1,0 +1,106 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: ${DB_NAME:-mlmadminstable}
+      MYSQL_USER: ${DB_USER:-bmpl}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD:-bmpl}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    networks:
+      - bmpl-net
+
+  admin-backend:
+    build:
+      context: .
+      dockerfile: docker/admin-backend.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: ${DOCKER_NODE_ENV:-production}
+      PORT: ${ADMIN_PORT:-3000}
+      ADMIN_PORT: ${ADMIN_PORT:-3000}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-mysql://root:${DB_PASSWORD:-secret}@mysql:3306/${DB_NAME:-mlmadminstable}}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - bmpl-net
+
+  user-backend:
+    build:
+      context: .
+      dockerfile: docker/user-backend.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: ${DOCKER_NODE_ENV:-production}
+      PORT: ${USER_PORT:-3001}
+      USER_PORT: ${USER_PORT:-3001}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-mysql://root:${DB_PASSWORD:-secret}@mysql:3306/${DB_NAME:-mlmadminstable}}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - bmpl-net
+
+  user-frontend:
+    build:
+      context: ./user_frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/v1}
+    restart: unless-stopped
+    depends_on:
+      - user-backend
+    networks:
+      - bmpl-net
+
+  admin-frontend:
+    build:
+      context: ./admin_frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/v1}
+    restart: unless-stopped
+    depends_on:
+      - admin-backend
+    networks:
+      - bmpl-net
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - admin-backend
+      - user-backend
+      - user-frontend
+      - admin-frontend
+    ports:
+      - "80:80"
+    environment:
+      - USER_FRONTEND_DOMAIN=${USER_FRONTEND_DOMAIN:-bmpl.thembi.in}
+      - ADMIN_FRONTEND_DOMAIN=${ADMIN_FRONTEND_DOMAIN:-admin.bmpl.thembi.in}
+    volumes:
+      - ./docker/nginx/templates:/etc/nginx/templates:ro
+    networks:
+      - bmpl-net
+
+volumes:
+  mysql-data:
+
+networks:
+  bmpl-net:
+    driver: bridge
