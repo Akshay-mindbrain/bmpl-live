@@ -1,0 +1,24 @@
+# Node modules
+**/node_modules/
+
+# Environment files
+**/.env
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/.vite/
+**/out/
+
+# OS / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+**/*.log
+
+# Prisma generated client
+prisma/generated/

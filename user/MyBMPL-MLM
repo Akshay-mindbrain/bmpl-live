@@ -1,0 +1,553 @@
+{
+  "info": {
+    "_postman_id": "e71bcfb5-7da3-4573-8e26-afeb0735353b",
+    "name": "MyBMPL-MLM",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46904851"
+  },
+  "item": [
+    {
+      "name": "PlanMaster",
+      "item": [
+        {
+          "name": "creating planMaster",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"planName\": \"Platinum Plan\",\r\n  \"Description\": \"High income premium plan\",\r\n  \"BV\": 750,\r\n  \"price\": 7500,\r\n  \"dp_amount\": 1500\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{module_variable}}/",
+              "host": [
+                "{{base_url}}{{module_variable}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getById PlanMaster",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}{{module_variable}}/4724c166-95c1-487f-be22-ad145f34db17",
+              "host": [
+                "{{base_url}}{{module_variable}}"
+              ],
+              "path": [
+                "4724c166-95c1-487f-be22-ad145f34db17"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAll PlanMaster",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}{{module_variable}}",
+              "host": [
+                "{{base_url}}{{module_variable}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update PlanMaster",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"BV\":1750\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{module_variable}}/4724c166-95c1-487f-be22-ad145f34db17",
+              "host": [
+                "{{base_url}}{{module_variable}}"
+              ],
+              "path": [
+                "4724c166-95c1-487f-be22-ad145f34db17"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PlanPurchase",
+      "item": [
+        {
+          "name": "planPurchase create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"BV\": 100,\r\n  \"dp_amount\": 200,\r\n  \"plan_amount\": 1000,\r\n  \"payment_mode\": \"UPI\",\r\n  \"payment_proof_uri\": \"https://dummy-proof.s3.amazonaws.com/payment1.png\",\r\n  \"purchase_type\": \"SHARE_PURCHASE\",\r\n  \"plan_id\":\"c0001659-0e4b-11f1-951d-24b2b914256a\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{planpurchase_module}}/",
+              "host": [
+                "{{base_url}}{{planpurchase_module}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All PlanPurchase",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"BV\": 100,\r\n  \"dp_amount\": 200,\r\n  \"plan_amount\": 1000,\r\n  \"payment_mode\": \"UPI\",\r\n  \"payment_proof_uri\": \"https://dummy-proof.s3.amazonaws.com/payment1.png\",\r\n  \"is_income_generated\": \"NO\",\r\n  \"purchase_type\": \"FIRST_PURCHASE\",\r\n  \"plan\":\"4724c166-95c1-487f-be22-ad145f34db17\",\r\n  \"user\":2\r\n}\r\n"
+            },
+            "url": {
+              "raw": "{{base_url}}{{planpurchase_module}}/",
+              "host": [
+                "{{base_url}}{{planpurchase_module}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plan Purchase By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}{{planpurchase_module}}/1",
+              "host": [
+                "{{base_url}}{{planpurchase_module}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getPurchasesByUser",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}{{planpurchase_module}}/my-purchases",
+              "host": [
+                "{{base_url}}{{planpurchase_module}}"
+              ],
+              "path": [
+                "my-purchases"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "approve Purchase",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"purchaseId\":1,\r\n    \"adminId\":1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{planpurchase_module}}/1/approve",
+              "host": [
+                "{{base_url}}{{planpurchase_module}}"
+              ],
+              "path": [
+                "1",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"mobile\": \"8888888889\",\r\n  \"password\": \"Password@123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/login",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Regen Token",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/regen-token",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "regen-token"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/logout",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "CRUD and others",
+          "item": [
+            {
+              "name": "Root User Master",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"firstName\": \"Root\",\r\n  \"lastName\": \"User\",\r\n  \"email\": \"root2@example.com\",\r\n  \"mobile\": \"9999999986\",\r\n  \"password\": \"Password@123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create nUsers Master",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"firstName\": \"User\",\r\n  \"lastName\": \"G\",\r\n  \"email\": \"userg@example.com\",\r\n  \"mobile\": \"8888888884\",\r\n  \"password\": \"Password@123\",\r\n  \"sponsorId\": 2,\r\n  \"legPosition\": \"LEFT\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GetUserById Master",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/profile/1",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "profile",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GetAllUsers Master",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "upline Master",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/5/upline",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "5",
+                    "upline"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "downline Master",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/1/downline",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "1",
+                    "downline"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "lastnode Master",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"legPosition\":\"LEFT\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/1/last-node-update",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    "1",
+                    "last-node-update"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "share purchase user",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"firstName\": \"User\",\r\n  \"lastName\": \"SHARE_PURCHASE_test\",\r\n  \"email\": \"usert@example.com\",\r\n  \"mobile\": \"8888888803\",\r\n  \"password\": \"Password@123\",\r\n  \"sponsorId\": 2,\r\n  \"legPosition\": \"RIGHT\",\r\n  \"useShare\": true\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}{{user_module}}/",
+                  "host": [
+                    "{{base_url}}{{user_module}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "KYC",
+      "item": [
+        {
+          "name": "KYC Create Master",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": 1,\r\n  \"aadharNo\": \"123412341234\",\r\n  \"aadharImgUrl\": \"https://dummy-kyc.s3.amazonaws.com/aadhar1.png\",\r\n  \"panNo\": \"ABCDE1234F\",\r\n  \"panImageUrl\": \"https://dummy-kyc.s3.amazonaws.com/pan1.png\",\r\n  \"bankName\": \"State Bank of India\",\r\n  \"accountNo\": \"123456789012\",\r\n  \"ifscCode\": \"SBIN0001234\",\r\n  \"branchName\": \"Bhubaneswar Main Branch\",\r\n  \"bankProofImgUrl\": \"https://dummy-kyc.s3.amazonaws.com/bank1.png\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{kyc_module}}/",
+              "host": [
+                "{{base_url}}{{kyc_module}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "KYC Update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\":\"APPROVED\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}{{kyc_module}}/1",
+              "host": [
+                "{{base_url}}{{kyc_module}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "module_variable",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "user_module",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "planpurchase_module",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "kyc_module",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
