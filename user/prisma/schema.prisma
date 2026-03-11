@@ -1,0 +1,684 @@
+// Single source of truth Prisma schema for both services.
+// Sync this file to user/admin with: npm run prisma:sync
+
+//common
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum LegPosition {
+  LEFT
+  RIGHT
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECT
+}
+
+enum AdminType {
+  SUPERADMIN
+  ADMIN
+  MANAGER
+}
+
+enum PurchaseType {
+  FIRST_PURCHASE
+  REPURCHASE
+  SHARE_PURCHASE
+}
+
+enum PurchaseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum IncomeGenerated {
+  NO  @map("0")
+  YES @map("1")
+}
+
+enum MemIdOption {
+  STATIC  @map("0")
+  DYNAMIC @map("1")
+}
+
+enum ApproveStatus {
+  AUTO        @map("0")
+  MANUALADMIN @map("1")
+}
+
+enum ShareStatus {
+  NOT_APPLICABLE
+  AVAILABLE
+  RESERVED
+  TRANSFERRED
+  EXPIRED
+}
+
+enum WalletStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum IncomeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum WalletTransactionType {
+  INCOME
+  WITHDRAW
+  PURCHASE
+  ADJUSTMENT
+}
+
+enum WalletTransactionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+//////////////////////////////////////////////////////
+// MODELS
+//////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////
+// ADMINS
+//////////////////////////////////////////////////////
+
+model Admin {
+  id        Int     @id @default(autoincrement()) @map("admin_id")
+  firstName String? @map("admin_fname")
+  email     String? @unique
+  mobile    String  @unique
+  lastName  String? @map("admin_lname")
+  username  String? @unique @map("admin_username")
+  password  String  @map("admin_password")
+
+  adminType AdminType @default(SUPERADMIN) @map("admin_type")
+
+  refreshToken String?  @map("refresh_token")
+  status       String   @default("1")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  loginHistory AdminLoginHistory[]
+
+  // Users relations
+  createdUsers User[] @relation("AdminCreatedUsers")
+  updatedUsers User[] @relation("AdminUpdatedUsers")
+
+  // KYC relations
+  kycCreated  Kyc[] @relation("AdminCreatedKyc")
+  kycUpdated  Kyc[] @relation("AdminUpdatedKyc")
+  kycApproved Kyc[] @relation("AdminApprovedKyc")
+
+  // Plans relations (FIXED)
+  createdPlans          PlansMaster[]  @relation("AdminCreatedPlans")
+  updatedPlans          PlansMaster[]  @relation("AdminUpdatedPlans")
+  approvedPlanPurchases PlanPurchase[] @relation("ApprovedPlanPurchases")
+
+  @@map("aa_0_admin_db")
+}
+
+//////////////////////////////////////////////////////
+// ADMIN LOGIN HISTORY
+//////////////////////////////////////////////////////
+model AdminLoginHistory {
+  id         Int       @id @default(autoincrement())
+  adminId    Int
+  ipAddress  String?
+  loginTime  DateTime  @default(now())
+  logoutTime DateTime?
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("admin_login_history")
+}
+
+//////////////////////////////////////////////////////
+// USERS
+//////////////////////////////////////////////////////
+model User {
+  id        Int     @id @default(autoincrement())
+  uId       Int?    @unique
+  memberId  String? @unique
+  parentId  Int?
+  sponsorId Int?
+
+  firstName String
+  lastName  String
+  mobile    String @unique
+  email     String @unique
+  password  String
+
+  legPosition  LegPosition?
+  leftChildId  Int?
+  rightChildId Int?
+  lastLeftId   Int?
+  lastRightId  Int?
+
+  lineagePath String
+  directCount Int    @default(0)
+
+  kycStatus KycStatus @default(PENDING)
+  status    Status    @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  sponsor        User?  @relation("SponsorRelation", fields: [sponsorId], references: [id], onDelete: SetNull)
+  sponsoredUsers User[] @relation("SponsorRelation")
+
+  parent   User?  @relation("ParentRelation", fields: [parentId], references: [id])
+  children User[] @relation("ParentRelation")
+
+  leftChild    User?  @relation("LeftChildRelation", fields: [leftChildId], references: [id], onDelete: SetNull)
+  leftChildren User[] @relation("LeftChildRelation")
+
+  rightChild    User?  @relation("RightChildRelation", fields: [rightChildId], references: [id], onDelete: SetNull)
+  rightChildren User[] @relation("RightChildRelation")
+
+  lastLeft      User?  @relation("LastLeftRelation", fields: [lastLeftId], references: [id])
+  lastLeftUsers User[] @relation("LastLeftRelation")
+
+  lastRight      User?  @relation("LastRightRelation", fields: [lastRightId], references: [id])
+  lastRightUsers User[] @relation("LastRightRelation")
+
+  refreshToken String? @map("refresh_token")
+
+  createdByAdminId Int?
+  updatedByAdminId Int?
+
+  createdByAdmin Admin? @relation("AdminCreatedUsers", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  updatedByAdmin Admin? @relation("AdminUpdatedUsers", fields: [updatedByAdminId], references: [id], onDelete: SetNull)
+
+  planPurchases  PlanPurchase[]    @relation("UserPlanPurchases")
+  closureSponsor UserTreeClosure[] @relation("ClosureSponsor")
+  closureParent  UserTreeClosure[] @relation("ClosureParent")
+  closureMember  UserTreeClosure[] @relation("ClosureMember")
+
+  kyc            Kyc []
+  userActivities UserActivityLog[]
+
+  boughtBVLedgers   BVLedger[] @relation("BVBuyerRelation")
+  receivedBVLedgers BVLedger[] @relation("BVReceiverRelation")
+
+  royalQualifiedUser     RoyalQualifier[] @relation("RoyalUserRelation")
+  royalQualifiedChildren RoyalQualifier[] @relation("RoyalChildRelation")
+  SystemIncome           SystemIncome[]
+  wallets                Wallet[]
+
+  WalletTransaction  WalletTransaction[]
+  RoyalClubIncome    RoyalClubIncome[]
+  UsersPayoutHistory UsersPayoutHistory[]
+  IncomeHistory      IncomeHistory[]
+  RewardHistory      RewardHistory[]
+
+  @@index([lineagePath])
+  @@index([uId])
+  @@index([sponsorId])
+  @@index([parentId])
+  @@index([memberId])
+  @@map("users")
+}
+
+//////////////////////////////////////////////////////
+// USER ACTIVITY LOG
+//////////////////////////////////////////////////////
+
+model UserActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String?
+  details   String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("user_activity_logs")
+}
+
+//////////////////////////////////////////////////////
+// KYC MODEL
+//////////////////////////////////////////////////////
+
+model Kyc {
+  id     Int @id @default(autoincrement())
+  userId Int 
+
+  aadharNo        String
+  aadharImgUrl    String
+  panNo           String
+  panImageUrl     String
+  bankName        String
+  accountNo       String
+  ifscCode        String
+  branchName      String
+  bankProofImgUrl String
+
+  status       KycStatus @default(PENDING)
+  rejectReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdByAdminId  Int?
+  updatedByAdminId  Int?
+  approvedByAdminId Int?
+
+  createdByAdmin  Admin? @relation("AdminCreatedKyc", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  updatedByAdmin  Admin? @relation("AdminUpdatedKyc", fields: [updatedByAdminId], references: [id], onDelete: SetNull)
+  approvedByAdmin Admin? @relation("AdminApprovedKyc", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+
+  @@map("kyc")
+}
+
+
+//////////////////////////////////////////////////////
+// PLAN 
+//////////////////////////////////////////////////////
+
+model PlansMaster {
+  id          String   @id @default(uuid())
+  planName    String   @unique
+  Description String
+  BV          Float
+  price       Float
+  dp_amount   Float
+  status      Status   @default(ACTIVE)
+  // dailyCap              Float
+  features    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  createdByAdminId Int?
+  updatedByAdminId Int?
+
+  createdByAdmin Admin? @relation("AdminCreatedPlans", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  updatedByAdmin Admin? @relation("AdminUpdatedPlans", fields: [updatedByAdminId], references: [id], onDelete: SetNull)
+
+  purchases    PlanPurchase[]
+  royalConfigs Config[]       @relation("ConfigRoyalPlans")
+  //previously package
+
+  @@map("plans_master")
+}
+
+//////////////////////////////////////////////////////
+// PLAN PURCHASE
+//////////////////////////////////////////////////////
+
+model PlanPurchase {
+  id      Int         @id @default(autoincrement())
+  plan_id String
+  plan    PlansMaster @relation(fields: [plan_id], references: [id])
+
+  user_id           Int
+  user              User    @relation("UserPlanPurchases", fields: [user_id], references: [id], onDelete: Cascade)
+  BV                Float
+  dp_amount         Float
+  plan_amount       Float
+  payment_mode      String?
+  payment_proof_uri String?
+
+  purchase_type PurchaseType
+  status        PurchaseStatus @default(PENDING)
+
+  approve_status  ApproveStatus @default(AUTO)
+  approved_by     Int?
+  approvedByAdmin Admin?        @relation("ApprovedPlanPurchases", fields: [approved_by], references: [id], onDelete: SetNull)
+  approved_at     DateTime?
+
+  is_income_generated IncomeGenerated @default(NO)
+
+  is_transferable Boolean @default(false)
+
+  share_status ShareStatus @default(NOT_APPLICABLE)
+
+  transferred_to_user_id Int?      @unique
+  transferred_at         DateTime?
+
+  parent_purchase_id Int?
+  parentPurchase     PlanPurchase?  @relation("PurchaseTransfer", fields: [parent_purchase_id], references: [id])
+  childTransfers     PlanPurchase[] @relation("PurchaseTransfer")
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  createdBy String
+  updatedBy String
+  bvLedgers BVLedger[]
+
+  @@index([user_id, purchase_type])
+  @@index([user_id, share_status])
+  @@index([parent_purchase_id])
+  @@map("plan_purchases")
+}
+
+//////////////////////////////////////////////////////
+// Config tables
+//////////////////////////////////////////////////////
+
+model Config {
+  id                 Int            @id @default(autoincrement())
+  autoMemId          MemIdOption    @default(STATIC)
+  userRegistrationNo Int            @default(0)
+  prefixMemId        String
+  minLength          Int
+  plan_config_key    String         @unique
+  plan_config_value  ApproveStatus  @default(AUTO)
+  incomeCommission   Decimal        @default(0) @db.Decimal(10, 2)
+  royaltyCommission  Decimal        @default(0) @db.Decimal(10, 2)
+  tds                Decimal        @default(0) @db.Decimal(10, 2)
+  admincharges       Decimal        @default(0) @db.Decimal(10, 2)
+
+  royalQualifierPlans PlansMaster[] @relation("ConfigRoyalPlans")
+
+  createdAt DateTime @default(now())
+
+  @@map("config_table")
+}
+
+//////////////////////////////////////////////////////
+// BVLedger
+//////////////////////////////////////////////////////
+
+model BVLedger {
+  id Int @id @default(autoincrement())
+
+  purchase_id Int
+  purchase    PlanPurchase @relation(fields: [purchase_id], references: [id])
+
+  buyer_id Int
+  buyer    User @relation("BVBuyerRelation", fields: [buyer_id], references: [id])
+
+  user_id Int //1,2,4 ... [from lineage paths ]
+  user    User @relation("BVReceiverRelation", fields: [user_id], references: [id])
+
+  bv            Float
+  purchase_type PurchaseType
+  buyer_leg     LegPosition?
+
+  is_income_generated IncomeGenerated @default(NO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([purchase_id, user_id])
+  @@index([user_id])
+  @@index([buyer_id])
+  @@index([purchase_id])
+  @@index([purchase_type])
+  @@map("bv_ledger")
+}
+
+//////////////////////////////////////////////////////
+// User Tree Closure
+//////////////////////////////////////////////////////
+
+model UserTreeClosure {
+  id Int @id @default(autoincrement())
+
+  sponsorId   Int
+  parentId    Int
+  memberId    Int
+  legPosition LegPosition
+
+  createdAt DateTime @default(now())
+
+  sponsor User @relation("ClosureSponsor", fields: [sponsorId], references: [id])
+  parent  User @relation("ClosureParent", fields: [parentId], references: [id])
+  member  User @relation("ClosureMember", fields: [memberId], references: [id])
+
+  @@index([sponsorId])
+  @@index([parentId])
+  @@index([memberId])
+  @@map("user_tree_closure")
+}
+
+//////////////////////////////////////////////////////
+// RoyalQualifier
+//////////////////////////////////////////////////////
+
+model RoyalQualifier {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  childId   Int
+  createdAt DateTime @default(now())
+  status    Status   @default(ACTIVE)
+  user      User     @relation("RoyalUserRelation", fields: [userId], references: [id])
+  child     User     @relation("RoyalChildRelation", fields: [childId], references: [id])
+
+  @@unique([userId, childId])
+  @@index([userId])
+  @@index([childId])
+  @@map("royal_qualifier")
+}
+
+//////////////////////////////////////////////////////
+// SystemIncome
+//////////////////////////////////////////////////////
+model SystemIncome {
+  id      Int  @id @default(autoincrement())
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  matched_bv   Int
+  income       Decimal @db.Decimal(18, 2)
+  message_data String?
+
+  generateIncomeId Int?
+  generateIncome   GenerateIncome? @relation(fields: [generateIncomeId], references: [id])
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy String?
+  updatedBy String?
+
+  @@index([createdAt])
+  @@index([user_id])
+  @@map("system_income")
+}
+
+//////////////////////////////////////////////////////
+// Wallet
+//////////////////////////////////////////////////////
+model Wallet {
+  id Int @id @default(autoincrement())
+
+  user_id Int  @unique
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  total_income   Decimal @default(0) @db.Decimal(18, 2)
+  total_withdraw Decimal @default(0) @db.Decimal(18, 2)
+
+  total_dp_amount   Decimal @default(0) @db.Decimal(18, 2)
+  balance_dp_amount Decimal @default(0) @db.Decimal(18, 2)
+
+  super_coins      Decimal @default(0) @db.Decimal(18, 2)
+  used_super_coins Decimal @default(0) @db.Decimal(18, 2)
+
+  matched_bv            Int @default(0)
+  total_left_bv         Int @default(0)
+  total_right_bv        Int @default(0)
+  left_carryforward_bv  Int @default(0)
+  right_carryforward_bv Int @default(0)
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("wallet")
+}
+
+//////////////////////////////////////////////////////
+// WalletTransaction
+//////////////////////////////////////////////////////
+
+model WalletTransaction {
+  id           Int                     @id @default(autoincrement())
+  user_id      Int
+  user         User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  type         WalletTransactionType
+  amount       Decimal                 @db.Decimal(18, 2)
+  reference_id Int?
+  message      String?
+  status       WalletTransactionStatus @default(ACTIVE)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  @@index([user_id])
+  @@map("wallet_transaction")
+}
+
+//////////////////////////////////////////////////////
+// RoyalClubIncome
+//////////////////////////////////////////////////////
+model RoyalClubIncome {
+  id               Int             @id @default(autoincrement())
+  user_id          Int
+  user             User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  generateIncomeId Int?
+  generateIncome   GenerateIncome? @relation(fields: [generateIncomeId], references: [id])
+  income           Decimal
+  message_data     String?
+  status           Status          @default(ACTIVE)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  createdBy        String?
+  updatedBy        String?
+
+  @@map("royal_club_income")
+}
+
+model Payout {
+  id           Int                  @id @default(autoincrement())
+  payoutDate   DateTime
+  payoutCycle  String
+  totalAmount  Decimal
+  tds          Decimal
+  adminCharges Decimal
+  netAmount    Decimal
+  remarks      String?
+  status       Status
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  createdBy    String?
+  updatedBy    String?
+  usersHistory UsersPayoutHistory[]
+
+  @@map("payout")
+}
+
+model UsersPayoutHistory {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  payoutId     Int
+  totalAmount  Decimal
+  tdsAmount    Decimal
+  adminCharges Decimal
+  netAmount    Decimal
+  status       Status
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    String?
+  updatedBy    String?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payout       Payout   @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@map("users_payout_history")
+}
+
+model GenerateIncome {
+  id             Int               @id @default(autoincrement())
+  totalIncome    Decimal           @db.Decimal(18, 2)
+  netincome      Float             @default(0)
+  tds            Decimal           @db.Decimal(18, 2)
+  adminCharges   Decimal           @db.Decimal(18, 2)
+  generatedDate  DateTime
+  createdAt      DateTime          @default(now())
+  systemIncomes  SystemIncome[]
+  royaltyIncomes RoyalClubIncome[]
+  IncomeHistory  IncomeHistory[]
+
+  @@map("generate_income")
+}
+
+model IncomeHistory {
+  id             Int            @id @default(autoincrement())
+  incomeId       Int
+  generateIncome GenerateIncome @relation(fields: [incomeId], references: [id], onDelete: Cascade)
+  userId         Int
+  user           User           @relation(fields: [userId], references: [id])
+  totalIncome    Decimal        @db.Decimal(18, 2)
+  tds            Decimal        @db.Decimal(18, 2)
+  adminCharges   Decimal        @db.Decimal(18, 2)
+  createdAt      DateTime       @default(now())
+
+  @@map("income_history")
+}
+
+model RewardConfig {
+  id            Int             @id @default(autoincrement())
+  matchedBV     Int
+  giftName      String
+  status        Status          @default(ACTIVE)
+  rewardHistory RewardHistory[]
+
+  @@unique([matchedBV])
+  @@map("reward_config")
+}
+
+model RewardHistory {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  rewardId  Int
+  matchedBV Int
+  giftName  String?
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward    RewardConfig @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, rewardId])
+  @@map("reward_history")
+}

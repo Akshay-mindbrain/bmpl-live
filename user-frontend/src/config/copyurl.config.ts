@@ -1,0 +1,1 @@
+export const REFERRAL_LINK="http://localhost:5174";
