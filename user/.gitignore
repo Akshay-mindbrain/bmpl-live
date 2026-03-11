@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+logs
+diagrams
+
+MyBMPL-MLM.postman_collection.json
+*.postman_collection.json
+*.zip
+
+SQL_QUERY/

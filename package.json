@@ -1,0 +1,21 @@
+{
+  "name": "bmpl-new-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "setup": "npm --prefix user install && npm --prefix admin install && npm run prisma:sync && npm run db:generate",
+    "dev:user": "npm --prefix user run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "build:user": "npm --prefix user run build",
+    "build:admin": "npm --prefix admin run build",
+    "db:up": "docker compose -f docker-compose.db.yml up -d",
+    "db:down": "docker compose -f docker-compose.db.yml down",
+    "db:logs": "docker compose -f docker-compose.db.yml logs -f db",
+    "prisma:sync": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Copy-Item -Path prisma/schema.prisma -Destination user/prisma/schema.prisma -Force; Copy-Item -Path prisma/schema.prisma -Destination admin/prisma/schema.prisma -Force\"",
+    "db:generate": "npm run prisma:sync && npm --prefix user run prisma:generate && npm --prefix admin run prisma:generate",
+    "db:migrate:create": "npm run prisma:sync && npm --prefix admin run migration:create",
+    "db:migrate": "npm run prisma:sync && npm --prefix admin run migrate",
+    "db:seed:user": "npm --prefix user run db:seed",
+    "db:seed:admin": "npm --prefix admin run db:seed"
+  }
+}
