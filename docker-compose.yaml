@@ -6,16 +6,17 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
       MYSQL_DATABASE: ${DB_NAME:-mybmpl_user}
       MYSQL_USER: ${DB_USER:-bmpl}
-      MYSQL_PASSWORD: ${DB_USER_PASSWORD:-bmpl}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-bmpl}
     ports:
-      - "${DB_PORT:-3307}:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - bmpl-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-secret}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 30s
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -39,7 +40,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       ADMIN_PORT: 3000
       DATABASE_URL: mysql://root:${DB_PASSWORD:-secret}@db:3306/${DB_NAME:-mybmpl_user}
     ports:
@@ -47,7 +48,14 @@ services:
     volumes:
       - ./:/workspace
       - admin-node-modules:/workspace/admin/node_modules
-    command: sh -c "npm install; npx prisma generate --schema prisma/schema.prisma; npx prisma migrate deploy --schema prisma/schema.prisma; npm run build && npm run start"
+    command: >
+      sh -c "
+      npm install &&
+      npx prisma generate --schema prisma/schema.prisma &&
+      npx prisma migrate deploy --schema prisma/schema.prisma &&
+      npm run build &&
+      npm run start
+      "
 
   user-api:
     image: node:22-bookworm
@@ -57,7 +65,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       USER_PORT: 3001
       DATABASE_URL: mysql://root:${DB_PASSWORD:-secret}@db:3306/${DB_NAME:-mybmpl_user}
     ports:
@@ -65,7 +73,14 @@ services:
     volumes:
       - ./:/workspace
       - user-node-modules:/workspace/user/node_modules
-    command: sh -c "npm install; npx prisma generate --schema prisma/schema.prisma; npx prisma migrate deploy --schema prisma/schema.prisma; npm run build && npm run start"
+    command: >
+      sh -c "
+      npm install &&
+      npx prisma generate --schema prisma/schema.prisma &&
+      npx prisma migrate deploy --schema prisma/schema.prisma &&
+      npm run build &&
+      npm run start
+      "
 
   user-frontend:
     image: node:22-alpine
@@ -81,7 +96,11 @@ services:
     volumes:
       - ./:/workspace
       - user-frontend-node-modules:/workspace/user-frontend/node_modules
-    command: sh -c "[ -x node_modules/.bin/vite ] || npm install; npm run dev -- --host 0.0.0.0 --port 5173"
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev -- --host 0.0.0.0 --port 5173
+      "
 
   admin-frontend:
     image: node:22-alpine
@@ -96,7 +115,11 @@ services:
     volumes:
       - ./:/workspace
       - admin-frontend-node-modules:/workspace/admin-frontend/node_modules
-    command: sh -c "[ -x node_modules/.bin/vite ] || npm install; npm run dev -- --host 0.0.0.0 --port 5174"
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev -- --host 0.0.0.0 --port 5174
+      "
 
 volumes:
   bmpl-db-data:
